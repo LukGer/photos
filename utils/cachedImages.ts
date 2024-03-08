@@ -7,6 +7,8 @@ export default async function getResults() {
     const fetchedResults = await cloudinary.v2.search
       .expression(`folder:${process.env.CLOUDINARY_FOLDER}/*`)
       .sort_by("public_id", "desc")
+      .with_field("context")
+      .with_field("metadata")
       .max_results(400)
       .execute();
 

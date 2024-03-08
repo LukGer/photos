@@ -1,11 +1,17 @@
 /* eslint-disable no-unused-vars */
 export interface ImageProps {
-  id: number;
   height: string;
   width: string;
   public_id: string;
+  asset_id: string;
   format: string;
   blurDataUrl?: string;
+  caption?: string;
+  cameraModel?: string;
+  apertureValue?: string;
+  exposureTime?: string;
+  focalLength?: string;
+  iso?: string;
 }
 
 export interface SharedModalProps {
