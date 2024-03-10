@@ -1,10 +1,17 @@
-import cloudinary from "../utils/cloudinary";
-import type { ImageProps } from "../utils/types";
+import cloudinary from "@/lib/cloudinary";
+import type { ImageProps } from "@/lib/types";
+import { Metadata } from "next";
 import ImageList from "./ImageList";
+
+export const metadata: Metadata = {
+  title: "Photos - Lukas Gerhold",
+  description:
+    "Photography portfolio by Lukas Gerhold. A collection of photos taken in the last years.",
+};
 
 export default async function Page() {
   const results = await cloudinary.v2.search
-    .expression(`folder:${process.env.CLOUDINARY_FOLDER}/*`)
+    .expression(`tags:${process.env.CLOUDINARY_TAG}`)
     .sort_by("public_id", "desc")
     .with_field("context")
     .execute();
@@ -18,11 +25,9 @@ export default async function Page() {
       public_id: result.public_id,
       asset_id: result.asset_id,
       format: result.format,
-      caption: results.context?.caption,
+      caption: result.context?.caption,
     });
   }
-
-  console.log(images);
 
   return <ImageList images={images} />;
 }

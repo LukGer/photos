@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 export interface ImageProps {
-  height: string;
-  width: string;
+  height: number;
+  width: number;
   public_id: string;
   asset_id: string;
   format: string;
