@@ -3,7 +3,7 @@ import ColorThief from "colorthief";
 import { AnimatePresence, motion } from "framer-motion";
 import { ApertureIcon, CameraIcon, RulerIcon } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { UIEvent, useEffect, useRef, useState } from "react";
 
 export default function Modal({
   images,
@@ -14,12 +14,12 @@ export default function Modal({
   selectedIndex: number | null;
   setSelectedIndex: (index: number | null) => void;
 }) {
-  function prev(event: Event) {
+  function prev(event: UIEvent | KeyboardEvent) {
     event.stopPropagation();
     setSelectedIndex(selectedIndex - 1);
   }
 
-  function next(event: Event) {
+  function next(event: UIEvent | KeyboardEvent) {
     event.stopPropagation();
     setSelectedIndex(selectedIndex + 1);
   }
