@@ -10,22 +10,22 @@ export const metadata: Metadata = {
 };
 
 export default async function Page() {
-  const results = await cloudinary.v2.search
-    .expression(`tags:${process.env.CLOUDINARY_TAG}`)
-    .sort_by("public_id", "desc")
-    .with_field("context")
-    .execute();
+  const results = await cloudinary.v2.api.resources_by_tag(
+    process.env.CLOUDINARY_TAG,
+    { context: true },
+  );
 
   const images: ImageProps[] = [];
 
   for (let result of results.resources) {
+    console.log(result.exif);
     images.push({
       height: result.height,
       width: result.width,
       public_id: result.public_id,
       asset_id: result.asset_id,
       format: result.format,
-      caption: result.context?.caption,
+      caption: result.context["custom"]["caption"],
     });
   }
 

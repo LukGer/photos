@@ -109,7 +109,6 @@ function GridImage({
 }) {
   return (
     <motion.div
-      layoutId={image.public_id}
       className="group relative overflow-y-clip"
       style={{ y: translateY }}
       whileHover={{ scale: 1.025, transition: { duration: 0.2 } }}
