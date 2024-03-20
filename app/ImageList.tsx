@@ -117,6 +117,8 @@ function GridImage({
     >
       <Image
         alt={image.caption}
+        blurDataURL={image.blurDataUrl}
+        placeholder="blur"
         className="transform rounded-lg brightness-100 transition will-change-auto group-hover:brightness-110"
         style={{ transform: "translate3d(0, 0, 0)" }}
         src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_720/${image.public_id}.${image.format}`}

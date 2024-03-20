@@ -1,4 +1,5 @@
 import cloudinary from "@/lib/cloudinary";
+import getBase64ImageUrl from "@/lib/generateBlurPlaceholder";
 import type { ImageProps } from "@/lib/types";
 import { Metadata } from "next";
 import ImageList from "./ImageList";
@@ -31,6 +32,16 @@ export default async function Page() {
       focalLength: result.context["custom"]["FocalLength"],
       iso: result.context["custom"]["ISO"],
     });
+  }
+
+  const blurImagePromises = images.map((image: ImageProps) => {
+    return getBase64ImageUrl(image);
+  });
+
+  const imagesWithBlurDataUrls = await Promise.all(blurImagePromises);
+
+  for (let i = 0; i < images.length; i++) {
+    images[i].blurDataUrl = imagesWithBlurDataUrls[i];
   }
 
   return <ImageList images={images} />;

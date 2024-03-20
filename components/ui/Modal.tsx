@@ -128,6 +128,8 @@ export default function Modal({
             <Image
               ref={imageRef}
               alt={image.caption}
+              blurDataURL={image.blurDataUrl}
+              placeholder="blur"
               className="transform rounded-lg brightness-100 transition will-change-auto group-hover:brightness-110"
               style={{ transform: "translate3d(0, 0, 0)" }}
               src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/${image.public_id}`}
