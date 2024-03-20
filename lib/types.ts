@@ -3,9 +3,9 @@ export interface ImageProps {
   height: number;
   width: number;
   public_id: string;
-  asset_id: string;
   format: string;
   blurDataUrl?: string;
+  origianlUrl: string;
   caption?: string;
   cameraModel?: string;
   apertureValue?: string;

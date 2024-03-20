@@ -1,7 +1,14 @@
 import { ImageProps } from "@/lib/types";
 import ColorThief from "colorthief";
 import { AnimatePresence, motion } from "framer-motion";
-import { ApertureIcon, CameraIcon, RulerIcon } from "lucide-react";
+import {
+  ApertureIcon,
+  CameraIcon,
+  CircleArrowOutUpRight,
+  InfoIcon,
+  RulerIcon,
+  TimerIcon,
+} from "lucide-react";
 import Image from "next/image";
 import { UIEvent, useEffect, useRef, useState } from "react";
 
@@ -129,50 +136,75 @@ export default function Modal({
               priority
             />
 
-            <button
-              className="absolute right-2 top-2 rounded-full bg-white p-1"
-              onClick={() => setShowImageInfo((prev) => !prev)}
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth={1.5}
-                stroke="currentColor"
-                className="h-6 w-6"
+            <div className="absolute right-3 top-3 flex flex-col gap-3">
+              <button
+                className="rounded-full bg-white p-1"
+                onClick={() => setShowImageInfo((prev) => !prev)}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="m11.25 11.25.041-.02a.75.75 0 0 1 1.063.852l-.708 2.836a.75.75 0 0 0 1.063.853l.041-.021M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9-3.75h.008v.008H12V8.25Z"
-                />
-              </svg>
-            </button>
+                <InfoIcon></InfoIcon>
+              </button>
+
+              <a
+                className="rounded-full bg-white p-1"
+                href={image.origianlUrl}
+                target="_blank"
+              >
+                <CircleArrowOutUpRight />
+              </a>
+            </div>
+
+            <AnimatePresence>
+              {showImageInfo && (
+                <motion.div
+                  className="absolute bottom-0 left-0 flex h-12 w-full flex-row items-center justify-between gap-2 rounded-b-lg bg-black/50 px-4 text-white"
+                  initial={{ opacity: 0, y: 5 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 5 }}
+                >
+                  <div className="flex flex-row items-center gap-2">
+                    <CameraIcon></CameraIcon>
+
+                    <span className=" font-bold">
+                      {image.cameraModel ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <ApertureIcon></ApertureIcon>
+
+                    <span className=" font-bold">
+                      {image.apertureValue ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <RulerIcon></RulerIcon>
+
+                    <span className="font-bold">
+                      {image.focalLength ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <TimerIcon></TimerIcon>
+
+                    <span className=" font-bold">
+                      {image.exposureTime ?? "-"}
+                    </span>
+                  </div>
+
+                  <div className="flex flex-row items-center gap-2">
+                    <div className="rounded-md border-2 border-white px-[2px]">
+                      <span className="text-xs font-bold">ISO</span>
+                    </div>
+
+                    <span className="font-bold">{image.iso ?? "-"}</span>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         </div>
-
-        <AnimatePresence>
-          {showImageInfo && (
-            <motion.div
-              className="absolute bottom-0 left-0 flex h-12 w-full flex-row items-center gap-2 bg-white px-4"
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: 10 }}
-            >
-              <CameraIcon></CameraIcon>
-
-              <span className="font-bold">{image.cameraModel ?? "-"}</span>
-
-              <ApertureIcon></ApertureIcon>
-
-              <span className="font-bold">{image.apertureValue ?? "-"}</span>
-
-              <RulerIcon></RulerIcon>
-
-              <span className="font-bold">{image.focalLength ?? "-"}</span>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </motion.div>
 
       {selectedIndex !== images.length - 1 && (
