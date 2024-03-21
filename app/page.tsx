@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 export default async function Page() {
   const results = await cloudinary.v2.api.resources_by_tag(
     process.env.CLOUDINARY_TAG,
-    { context: true },
+    { context: true, max_results: 100 },
   );
 
   const images: ImageProps[] = [];
