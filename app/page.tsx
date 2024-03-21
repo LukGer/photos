@@ -8,7 +8,10 @@ export const metadata: Metadata = {
   title: "Photos - Lukas Gerhold",
   description:
     "Photography portfolio by Lukas Gerhold. A collection of photos taken in the last years.",
+  creator: "Lukas Gerhold",
 };
+
+export const revalidate = 3600;
 
 export default async function Page() {
   const results = await cloudinary.v2.api.resources_by_tag(

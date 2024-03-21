@@ -74,9 +74,12 @@ export default function Modal({
 
   return (
     <motion.div
-      initial={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
-      animate={{ backgroundColor: `rgba(${dominantColor.join(", ")}, 0.6)` }}
-      exit={{ backgroundColor: "rgba(0, 0, 0, 0)" }}
+      initial={{ opacity: 0 }}
+      animate={{
+        backgroundColor: `rgba(${dominantColor.join(", ")}, 0.75)`,
+        opacity: 1,
+      }}
+      exit={{ opacity: 0 }}
       className="fixed inset-0 flex items-center justify-center gap-6"
       onClick={() => setSelectedIndex(null)}
     >
