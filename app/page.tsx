@@ -1,5 +1,5 @@
 import cloudinary from "@/lib/cloudinary";
-import getBase64ImageUrl from "@/lib/generateBlurPlaceholder";
+import { getBase64ImageUrl } from "@/lib/generateBlurPlaceholder";
 import type { ImageProps } from "@/lib/types";
 import { Metadata } from "next";
 import ImageList from "./ImageList";

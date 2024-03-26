@@ -134,7 +134,7 @@ export default function Modal({
               blurDataURL={image.blurDataUrl}
               placeholder="blur"
               className="rounded-lg object-contain"
-              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_${image.width}/${image.public_id}`}
+              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/q_auto:best/${image.public_id}`}
               sizes="100vw"
               layout="fill"
               priority
