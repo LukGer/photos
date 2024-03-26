@@ -127,17 +127,16 @@ export default function Modal({
             {images[selectedIndex].caption}
           </span>
 
-          <div className="relative">
+          <div className="relative h-[80vh] w-[60vw]">
             <Image
               ref={imageRef}
               alt={image.caption}
               blurDataURL={image.blurDataUrl}
               placeholder="blur"
-              className="transform rounded-lg brightness-100 transition will-change-auto group-hover:brightness-110"
-              style={{ transform: "translate3d(0, 0, 0)" }}
-              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/f_auto,q_auto/${image.public_id}`}
-              width={720}
-              height={480}
+              className="rounded-lg object-contain"
+              src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_scale,w_${image.width}/${image.public_id}`}
+              sizes="100vw"
+              layout="fill"
               priority
             />
 
@@ -151,7 +150,7 @@ export default function Modal({
 
               <a
                 className="rounded-full bg-white p-1"
-                href={image.origianlUrl}
+                href={image.originalUrl}
                 target="_blank"
               >
                 <CircleArrowOutUpRight />

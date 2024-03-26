@@ -34,7 +34,7 @@ export default function ImageList({ images }: { images: ImageProps[] }) {
   return (
     <>
       <main
-        className="w-full items-start overflow-y-auto bg-slate-50 dark:bg-slate-950 dark:text-white"
+        className="h-full w-full items-start overflow-y-auto bg-slate-50 dark:bg-slate-950 dark:text-white"
         ref={gridRef}
       >
         <div className="flex flex-row items-center bg-slate-50 px-20 py-5 dark:bg-slate-950 dark:text-white">
@@ -43,7 +43,7 @@ export default function ImageList({ images }: { images: ImageProps[] }) {
           </a>
         </div>
         <div
-          className="mx-auto grid max-w-5xl grid-cols-1 items-start  gap-5 px-10 pt-10 md:grid-cols-2 lg:grid-cols-3"
+          className="mx-auto grid max-w-7xl grid-cols-1 items-start gap-5 px-10 pt-10 md:grid-cols-2 lg:grid-cols-3"
           ref={gridRef}
         >
           <div className="grid gap-5">

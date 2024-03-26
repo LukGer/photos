@@ -5,7 +5,7 @@ export interface ImageProps {
   public_id: string;
   format: string;
   blurDataUrl?: string;
-  origianlUrl: string;
+  originalUrl: string;
   caption?: string;
   cameraModel?: string;
   apertureValue?: string;

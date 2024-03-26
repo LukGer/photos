@@ -27,7 +27,7 @@ export default async function Page() {
       width: result.width,
       public_id: result.public_id,
       format: result.format,
-      origianlUrl: result.url,
+      originalUrl: result.url,
       caption: result.context["custom"]["caption"],
       cameraModel: result.context["custom"]["Camera"],
       exposureTime: result.context["custom"]["ExposureTime"],
