@@ -13,7 +13,7 @@ async function getBlur(image: ImageProps): Promise<string> {
   );
 
   const blurSvg = `
-    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 5'>
+    <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 400 250'>
       <filter id='b' color-interpolation-filters='sRGB'>
         <feGaussianBlur stdDeviation='0.1' />
       </filter>

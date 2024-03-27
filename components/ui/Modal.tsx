@@ -127,16 +127,17 @@ export default function Modal({
             {images[selectedIndex].caption}
           </span>
 
-          <div className="relative h-[80vh] w-[60vw]">
+          <div className="relative">
             <Image
               ref={imageRef}
               alt={image.caption}
               blurDataURL={image.blurDataUrl}
               placeholder="blur"
-              className="rounded-lg object-contain"
+              className="rounded-lg"
               src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/q_auto:best/${image.public_id}`}
-              sizes="100vw"
-              layout="fill"
+              width={image.width}
+              height={image.height}
+              layout="responsive"
               priority
             />
 
