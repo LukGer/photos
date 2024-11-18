@@ -25,11 +25,9 @@ export default function ImageList({ images }: { images: ImageProps[] }) {
   const translateSecond = useTransform(scrollYProgress, [0, 1], [0, 0]);
   const translateThird = useTransform(scrollYProgress, [0, 1], [0, 100]);
 
-  const third = Math.ceil(images.length / 3);
-
-  const firstPart = images.slice(0, third);
-  const secondPart = images.slice(third, 2 * third);
-  const thirdPart = images.slice(2 * third);
+  const firstPart = images.filter((_, index) => index % 3 === 0);
+  const secondPart = images.filter((_, index) => index % 3 === 1);
+  const thirdPart = images.filter((_, index) => index % 3 === 2);
 
   return (
     <>
