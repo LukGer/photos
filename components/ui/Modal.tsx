@@ -91,7 +91,7 @@ export default function Modal({
         transition={{ duration: 0.3 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="rounded-full bg-white p-2 disabled:!opacity-50"
+        className="rounded-full bg-white p-2 disabled:opacity-50!"
         onClick={(e) => prev(e)}
       >
         <svg
@@ -132,7 +132,7 @@ export default function Modal({
               ref={imageRef}
               alt={image.caption}
               blurDataURL={image.blurDataUrl}
-              placeholder="blur"
+              placeholder="blur-sm"
               className="rounded-lg"
               src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/q_auto:best/${image.public_id}`}
               width={image.width}
@@ -220,7 +220,7 @@ export default function Modal({
         transition={{ duration: 0.3 }}
         whileHover={{ scale: 1.1 }}
         whileTap={{ scale: 0.95 }}
-        className="rounded-full bg-white p-2 disabled:!opacity-50"
+        className="rounded-full bg-white p-2 disabled:opacity-50!"
         onClick={(e) => next(e)}
       >
         <svg
