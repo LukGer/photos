@@ -2,13 +2,13 @@
 
 import Modal from "@/components/ui/Modal";
 import { ImageProps } from "@/lib/types";
+import { useScroll } from "motion/lib";
 import {
   AnimatePresence,
-  MotionValue,
   motion,
-  useScroll,
+  MotionValue,
   useTransform,
-} from "framer-motion";
+} from "motion/react";
 import Image from "next/image";
 import { useRef, useState } from "react";
 
