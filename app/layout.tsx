@@ -1,8 +1,11 @@
 import { Analytics } from "@vercel/analytics/react";
-import { Nunito } from "next/font/google";
+import { Geist_Mono } from "next/font/google";
 import "./index.css";
 
-const nunito = Nunito({ subsets: ["latin"] });
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
 
 export default function RootLayout({
   children,
@@ -11,7 +14,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={nunito.className + " flex h-screen flex-col"}>
+      <body className={`${geistMono.variable} flex h-screen flex-col`}>
         {children}
         <Analytics />
       </body>

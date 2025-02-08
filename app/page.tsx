@@ -1,6 +1,5 @@
-import cloudinary from "@/lib/cloudinary";
-import { getBase64ImageUrl } from "@/lib/generateBlurPlaceholder";
-import type { ImageProps } from "@/lib/types";
+import { imagekit } from "@/lib/imagekit";
+import { FullImage } from "@/lib/types";
 import { Metadata } from "next";
 import ImageList from "./ImageList";
 
@@ -11,41 +10,23 @@ export const metadata: Metadata = {
   creator: "Lukas Gerhold",
 };
 
-export const revalidate = 3600;
-
 export default async function Page() {
-  const results = await cloudinary.v2.api.resources_by_tag(
-    process.env.CLOUDINARY_TAG,
-    { context: true, max_results: 100 },
+  const images = (await imagekit.listFiles({
+    type: "file",
+  })) as unknown as FullImage[];
+
+  return (
+    <main className="flex h-full flex-col">
+      <div className="flex flex-row items-center px-4 pt-4 font-mono text-sm text-gray-900/30">
+        <span className="font-bold">The Gallery</span>
+
+        <div className="flex-1"></div>
+
+        <a href="https://www.lukger.dev" target="_blank">
+          (c) Lukas Gerhold {new Date().getFullYear()}
+        </a>
+      </div>
+      <ImageList images={images} />
+    </main>
   );
-
-  const images: ImageProps[] = [];
-
-  for (let result of results.resources) {
-    images.push({
-      height: result.height,
-      width: result.width,
-      public_id: result.public_id,
-      format: result.format,
-      originalUrl: result.url,
-      caption: result.context["custom"]["caption"],
-      cameraModel: result.context["custom"]["Camera"],
-      exposureTime: result.context["custom"]["ExposureTime"],
-      apertureValue: result.context["custom"]["FNumber"],
-      focalLength: result.context["custom"]["FocalLength"],
-      iso: result.context["custom"]["ISO"],
-    });
-  }
-
-  const blurImagePromises = images.map((image: ImageProps) => {
-    return getBase64ImageUrl(image);
-  });
-
-  const imagesWithBlurDataUrls = await Promise.all(blurImagePromises);
-
-  for (let i = 0; i < images.length; i++) {
-    images[i].blurDataUrl = imagesWithBlurDataUrls[i];
-  }
-
-  return <ImageList images={images} />;
 }
