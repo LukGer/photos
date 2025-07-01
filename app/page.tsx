@@ -10,6 +10,8 @@ export const metadata: Metadata = {
   creator: "Lukas Gerhold",
 };
 
+export const revalidate = 3600;
+
 export default async function Page() {
   const images = (await imagekit.listFiles({
     type: "file",
