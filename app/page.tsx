@@ -1,7 +1,8 @@
-import { imagekit } from "@/lib/imagekit";
-import { FullImage } from "@/lib/types";
+// app/photos/page.tsx
+import Masonry, { MasonryItem } from "@/components/Masonry";
+import { readFileSync } from "fs";
 import { Metadata } from "next";
-import ImageList from "./ImageList";
+import { join } from "path";
 
 export const metadata: Metadata = {
   title: "Photos - Lukas Gerhold",
@@ -10,27 +11,65 @@ export const metadata: Metadata = {
   creator: "Lukas Gerhold",
 };
 
-export const revalidate = 3600;
+// Tell Next.js to statically revalidate this page every 24h (optional)
+export const revalidate = 86400; // seconds = 1 day
 
-export default async function Page() {
-  const images = (await imagekit.listFiles({
-    type: "file",
-  })) as unknown as FullImage[];
+interface MetadataItem {
+  filename: string;
+  src: string;
+  iso: number | null;
+  aperture: string | null;
+  shutter: string | null;
+  camera: string | null;
+  lens: string | null;
+  date: string | null;
+  width: number;
+  height: number;
+}
+
+function getItems(): MasonryItem[] {
+  const filePath = join(process.cwd(), "public", "meta.json");
+  const fileContents = readFileSync(filePath, "utf8");
+  const items = JSON.parse(fileContents) as MetadataItem[];
+
+  return items
+    .sort(
+      (a, b) =>
+        new Date(b.date || 0).getTime() - new Date(a.date || 0).getTime(),
+    )
+    .map((item) => ({
+      id: item.filename,
+      img: item.src,
+      url: `/p/${item.filename}`,
+      height: item.height * 0.5,
+      width: item.width,
+    }));
+}
+
+export default function Page() {
+  const items = getItems();
 
   return (
-    <main className="flex h-full flex-col">
-      <div className="flex flex-row items-center px-4 pt-4 font-mono text-sm text-gray-900/30">
-        <span className="font-bold">The Gallery</span>
+    <main className="flex flex-col gap-2 p-4">
+      <div className="flex flex-row px-1.5">
+        <h1 className="font-mono text-4xl font-bold">The Gallery</h1>
 
         <div className="flex-1"></div>
 
-        <a href="https://www.lukger.dev" target="_blank">
-          (c) Lukas Gerhold {new Date().getFullYear()}
-        </a>
+        <span className="text-xs">(c) 2025 Lukas Gerhold</span>
       </div>
-      <ImageList images={images} />
-      <div className="pointer-events-none absolute inset-0 grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
-        <div className="col-span-full row-span-full animate-[fade-in_1s_ease-out] border-zinc-800/30 [background-image:radial-gradient(circle,rgb(82_82_82/0.3)_1px,transparent_1px)] [background-size:24px_24px] [background-position:12px_12px]" />
+      <div className="flex-1">
+        <Masonry
+          items={items}
+          ease="power3.out"
+          duration={0.6}
+          stagger={0.1}
+          animateFrom="bottom"
+          scaleOnHover
+          hoverScale={0.95}
+          blurToFocus
+          colorShiftOnHover
+        />
       </div>
     </main>
   );

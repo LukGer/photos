@@ -1,4 +1,3 @@
-import { Analytics } from "@vercel/analytics/react";
 import { Geist_Mono } from "next/font/google";
 import "./index.css";
 
@@ -16,7 +15,6 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${geistMono.variable} flex h-screen flex-col`}>
         {children}
-        <Analytics />
       </body>
     </html>
   );

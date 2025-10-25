@@ -1,0 +1,122 @@
+[
+  {
+    "filename": "alley.avif",
+    "src": "/photos/alley.avif",
+    "width": 2560,
+    "height": 3840,
+    "iso": 320,
+    "aperture": "f/11",
+    "shutter": "1/58s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2025-06-15T13:21:12.000Z"
+  },
+  {
+    "filename": "battersea.avif",
+    "src": "/photos/battersea.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 640,
+    "aperture": "f/4",
+    "shutter": "1/2200s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2024-09-21T16:01:01.000Z"
+  },
+  {
+    "filename": "danube.avif",
+    "src": "/photos/danube.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 640,
+    "aperture": "f/3.6",
+    "shutter": "1/420s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2024-08-29T17:47:09.000Z"
+  },
+  {
+    "filename": "eye.avif",
+    "src": "/photos/eye.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 640,
+    "aperture": "f/4",
+    "shutter": "1/480s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2024-09-21T16:34:50.000Z"
+  },
+  {
+    "filename": "globe.avif",
+    "src": "/photos/globe.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 400,
+    "aperture": "f/5.6",
+    "shutter": "1/680s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2024-09-20T14:05:18.000Z"
+  },
+  {
+    "filename": "keith.avif",
+    "src": "/photos/keith.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 320,
+    "aperture": "f/11",
+    "shutter": "1/125s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2025-06-15T12:49:51.000Z"
+  },
+  {
+    "filename": "narrow.avif",
+    "src": "/photos/narrow.avif",
+    "width": 2560,
+    "height": 3840,
+    "iso": 320,
+    "aperture": "f/11",
+    "shutter": "1/400s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2025-06-15T11:35:21.000Z"
+  },
+  {
+    "filename": "orange.avif",
+    "src": "/photos/orange.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 320,
+    "aperture": "f/8",
+    "shutter": "1/680s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2025-06-15T10:21:14.000Z"
+  },
+  {
+    "filename": "serenity.avif",
+    "src": "/photos/serenity.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 640,
+    "aperture": "f/8",
+    "shutter": "1/500s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2024-10-19T06:22:16.000Z"
+  },
+  {
+    "filename": "statue.avif",
+    "src": "/photos/statue.avif",
+    "width": 2560,
+    "height": 1707,
+    "iso": 320,
+    "aperture": "f/8",
+    "shutter": "1/340s",
+    "camera": "X100V",
+    "lens": null,
+    "date": "2025-06-15T14:57:10.000Z"
+  }
+]
