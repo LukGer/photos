@@ -1,5 +1,6 @@
 {
   "lockfileVersion": 1,
+  "configVersion": 0,
   "workspaces": {
     "": {
       "dependencies": {
@@ -25,7 +26,7 @@
       "devDependencies": {
         "@tailwindcss/postcss": "^4.1.16",
         "@types/node": "24.9.1",
-        "@types/react": "^19.0.0-rc.1",
+        "@types/react": "^19.2.2",
         "postcss": "^8.5.6",
         "prettier": "^3.6.2",
         "prettier-plugin-tailwindcss": "^0.7.1",

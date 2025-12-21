@@ -41,6 +41,7 @@
   --animate-fade-in: fade-in 1s ease-out;
 
   --font-mono: "Geist Mono";
+  --font-handwritten: var(--font-handwritten);
 
   @keyframes accordion-down {
     from {

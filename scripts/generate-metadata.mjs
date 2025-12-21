@@ -1,62 +1,80 @@
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import exifr from "exifr";
-import fs from "fs";
-import path from "path";
 import sharp from "sharp";
-import { fileURLToPath } from "url";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 
-const photosDir = path.join(projectRoot, "public", "photos");
+const sourceDir = path.join(projectRoot, "images");
+const outputDir = path.join(projectRoot, "public", "photos");
 const outputFile = path.join(projectRoot, "public", "meta.json");
 
 async function generateMetadata() {
-  const files = fs
-    .readdirSync(photosDir)
-    .filter((f) => /\.(jpg|jpeg|png|heic|webp|avif)$/i.test(f));
+	if (!fs.existsSync(outputDir)) {
+		fs.mkdirSync(outputDir, { recursive: true });
+	}
 
-  const result = [];
+	const files = fs
+		.readdirSync(sourceDir)
+		.filter((f) => /\.(jpg|jpeg|png|heic|webp|avif)$/i.test(f));
 
-  for (const file of files) {
-    const filePath = path.join(photosDir, file);
-    try {
-      // Read EXIF
-      const exif = await exifr.parse(filePath, [
-        "Model",
-        "LensModel",
-        "ISO",
-        "FNumber",
-        "ExposureTime",
-        "DateTimeOriginal",
-      ]);
+	const result = [];
 
-      // Read dimensions
-      const { width, height } = await sharp(filePath).metadata();
+	for (const file of files) {
+		const filePath = path.join(sourceDir, file);
+		const baseName = path.parse(file).name;
+		const outputFilename = `${baseName}.avif`;
+		const outputPath = path.join(outputDir, outputFilename);
 
-      result.push({
-        filename: file,
-        src: `/photos/${file}`,
-        width,
-        height,
-        iso: exif?.ISO || null,
-        aperture: exif?.FNumber ? `f/${exif.FNumber}` : null,
-        shutter: exif?.ExposureTime ? formatExposure(exif.ExposureTime) : null,
-        camera: exif?.Model || null,
-        lens: exif?.LensModel || null,
-        date: exif?.DateTimeOriginal || null,
-      });
-    } catch (err) {
-      console.error(`❌ Error parsing ${file}:`, err.message);
-    }
-  }
+		try {
+			console.log(`📸 Processing ${file}...`);
 
-  fs.writeFileSync(outputFile, JSON.stringify(result, null, 2));
-  console.log(`✅ Wrote metadata for ${result.length} photos to ${outputFile}`);
+			// Read EXIF from source
+			const exif = await exifr.parse(filePath, [
+				"Model",
+				"LensModel",
+				"ISO",
+				"FNumber",
+				"ExposureTime",
+				"DateTimeOriginal",
+			]);
+
+			// Process image with sharp: get metadata and convert to avif
+			const image = sharp(filePath);
+			const { width, height } = await image.metadata();
+
+			await image
+				.avif({ quality: 50 }) // Adjust quality as needed
+				.toFile(outputPath);
+
+			result.push({
+				filename: outputFilename,
+				title: "",
+				subtitle: "",
+				src: `/photos/${outputFilename}`,
+				width,
+				height,
+				iso: exif?.ISO || null,
+				aperture: exif?.FNumber ? `f/${exif.FNumber}` : null,
+				shutter: exif?.ExposureTime ? formatExposure(exif.ExposureTime) : null,
+				camera: exif?.Model || null,
+				lens: exif?.LensModel || null,
+				date: exif?.DateTimeOriginal || null,
+			});
+		} catch (err) {
+			console.error(`❌ Error processing ${file}:`, err.message);
+		}
+	}
+
+	fs.writeFileSync(outputFile, JSON.stringify(result, null, 2));
+	console.log(`✅ Wrote metadata for ${result.length} photos to ${outputFile}`);
 }
 
 function formatExposure(val) {
-  return val >= 1 ? `${val}s` : `1/${Math.round(1 / val)}s`;
+	return val >= 1 ? `${val}s` : `1/${Math.round(1 / val)}s`;
 }
 
 generateMetadata().catch((e) => console.error("Fatal error:", e));
