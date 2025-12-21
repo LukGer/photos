@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { encode } from "blurhash";
 import exifr from "exifr";
 import sharp from "sharp";
 
@@ -46,9 +47,31 @@ async function generateMetadata() {
 			const image = sharp(filePath);
 			const { width, height } = await image.metadata();
 
-			await image
-				.avif({ quality: 50 }) // Adjust quality as needed
-				.toFile(outputPath);
+			// Generate blurhash
+			const { data, info } = await image
+				.clone()
+				.raw()
+				.ensureAlpha()
+				.resize(32, 32, { fit: "inside" })
+				.toBuffer({ resolveWithObject: true });
+
+			const blurhash = encode(
+				new Uint8ClampedArray(data),
+				info.width,
+				info.height,
+				4,
+				4,
+			);
+
+			// Generate blurDataURL for next/image
+			const blurDataURL = await image
+				.clone()
+				.resize(12)
+				.avif({ quality: 20 })
+				.toBuffer()
+				.then((b) => `data:image/avif;base64,${b.toString("base64")}`);
+
+			await image.avif({ quality: 50 }).toFile(outputPath);
 
 			result.push({
 				filename: outputFilename,
@@ -63,6 +86,8 @@ async function generateMetadata() {
 				camera: exif?.Model || null,
 				lens: exif?.LensModel || null,
 				date: exif?.DateTimeOriginal || null,
+				blurhash,
+				blurDataURL,
 			});
 		} catch (err) {
 			console.error(`❌ Error processing ${file}:`, err.message);

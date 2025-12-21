@@ -24,6 +24,8 @@ export function Polaroid({ item }: { item: MetadataItem }) {
 					alt={item.title || item.filename}
 					fill
 					className="object-cover"
+					placeholder="blur"
+					blurDataURL={item.blurDataURL}
 				/>
 			</div>
 			<div className="mt-2 flex flex-col h-20 pt-2">

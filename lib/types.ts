@@ -11,4 +11,6 @@ export interface MetadataItem {
 	camera: string;
 	lens: string;
 	date: string;
+	blurhash: string;
+	blurDataURL: string;
 }
