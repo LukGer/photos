@@ -1,6 +1,8 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import Image from "next/image";
+import { BackButton } from "@/components/BackButton";
+import { ImageInfos } from "@/components/ImageInfos";
 import type { MetadataItem } from "@/lib/types";
 
 function getMetadata(): MetadataItem[] {
@@ -48,8 +50,14 @@ export default async function PhotoPage({
 	}
 
 	return (
-		<div className="flex min-h-screen justify-center bg-black pt-[10vh]">
-			<div className="relative max-h-[80vh] max-w-full">
+		<div className="flex min-h-screen justify-center bg-black pt-[10vh] relative">
+			<div className="absolute top-4 left-4 ">
+				<BackButton />
+			</div>
+			<div className="absolute bottom-4 left-4 ">
+				<ImageInfos image={imageData} />
+			</div>
+			<div className="max-h-[80vh] max-w-full">
 				<Image
 					src={imageData.src}
 					alt={imageData.filename}

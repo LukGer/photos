@@ -3,6 +3,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Polaroid } from "@/components/Polaroid";
 import type { MetadataItem } from "@/lib/types";
 
@@ -37,7 +38,9 @@ export default function Page() {
 			</div>
 			<div className="flex-1 grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
 				{items.map((item) => (
-					<Polaroid key={item.filename} item={item} />
+					<Link key={item.filename} href={`/p/${item.filename}`}>
+						<Polaroid item={item} />
+					</Link>
 				))}
 			</div>
 		</main>
