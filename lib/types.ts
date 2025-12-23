@@ -9,7 +9,7 @@ export interface MetadataItem {
 	aperture: string;
 	shutter: string;
 	camera: string;
-	lens: string;
+	lens?: string;
 	date: string;
 	blurhash: string;
 	blurDataURL: string;
