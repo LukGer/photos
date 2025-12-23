@@ -28,7 +28,7 @@ export function Polaroid({ item }: { item: MetadataItem }) {
 					blurDataURL={item.blurDataURL}
 				/>
 			</div>
-			<div className="mt-2 flex flex-col h-20 pt-2">
+			<div className="mt-4 flex flex-col h-20 pt-2">
 				<span
 					className="font-handwritten text-2xl self-center"
 					style={{ transform: `rotate(${rotation}deg)` }}
@@ -36,7 +36,14 @@ export function Polaroid({ item }: { item: MetadataItem }) {
 					{item.title}
 				</span>
 				<div className="flex-1"></div>
-				<span className="text-xs font-mono text-gray-800">{item.subtitle}</span>
+				<span className="text-xs font-mono text-gray-800">
+					{item.subtitle}
+					{", "}
+					{new Date(item.date).toLocaleDateString("en-US", {
+						year: "numeric",
+						month: "long",
+					})}
+				</span>
 			</div>
 		</motion.div>
 	);
