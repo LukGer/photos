@@ -18,6 +18,21 @@ async function generateMetadata() {
 		fs.mkdirSync(outputDir, { recursive: true });
 	}
 
+	// Load existing metadata if it exists
+	let existingMeta = {};
+	if (fs.existsSync(outputFile)) {
+		try {
+			const existingData = JSON.parse(fs.readFileSync(outputFile, "utf-8"));
+			// Create a map of existing metadata by filename for quick lookup
+			existingMeta = Object.fromEntries(
+				existingData.map((item) => [item.filename, item])
+			);
+			console.log(`📋 Loaded ${Object.keys(existingMeta).length} existing metadata entries`);
+		} catch (err) {
+			console.warn(`⚠️  Could not read existing metadata: ${err.message}`);
+		}
+	}
+
 	const files = fs
 		.readdirSync(sourceDir)
 		.filter((f) => /\.(jpg|jpeg|png|heic|webp|avif)$/i.test(f));
@@ -73,10 +88,13 @@ async function generateMetadata() {
 
 			await image.avif({ quality: 50 }).toFile(outputPath);
 
+			// Check if this image already has metadata
+			const existingEntry = existingMeta[outputFilename];
+
 			result.push({
 				filename: outputFilename,
-				title: "",
-				subtitle: "",
+				title: existingEntry?.title || "",
+				subtitle: existingEntry?.subtitle || "",
 				src: `/photos/${outputFilename}`,
 				width,
 				height,
