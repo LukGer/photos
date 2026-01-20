@@ -4,6 +4,8 @@ import { join } from "node:path";
 
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Magnetic } from "@/components/Magnetic";
+import { MagneticProvider } from "@/components/MagneticContext";
 import { Polaroid } from "@/components/Polaroid";
 import type { MetadataItem } from "@/lib/types";
 
@@ -36,13 +38,17 @@ export default function Page() {
 
 				<span className="text-xs">(c) 2025 Lukas Gerhold</span>
 			</div>
-			<div className="flex-1 grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
-				{items.map((item) => (
-					<Link key={item.filename} href={`/p/${item.filename}`}>
-						<Polaroid item={item} />
-					</Link>
-				))}
-			</div>
+			<MagneticProvider>
+				<div className="flex-1 grid grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
+					{items.map((item) => (
+						<Link key={item.filename} href={`/p/${item.filename}`}>
+							<Magnetic>
+								<Polaroid item={item} />
+							</Magnetic>
+						</Link>
+					))}
+				</div>
+			</MagneticProvider>
 		</main>
 	);
 }
