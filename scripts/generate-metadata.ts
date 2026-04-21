@@ -92,14 +92,52 @@ export async function generateMetadata(): Promise<void> {
     const outputFilename = `${baseName}.avif`;
     const outputPath = path.join(outputDir, outputFilename);
     const existingEntry = existingByFilename.get(outputFilename);
+    const stat = fs.statSync(filePath);
+    const mtimeMs = stat.mtimeMs;
+    const imageUnchanged =
+      existingEntry?.sourceMtime === mtimeMs && fs.existsSync(outputPath);
+    const hasUserLocation = !!(
+      existingEntry && userStringOrEmpty(existingEntry.location)
+    );
 
     try {
+      if (imageUnchanged && hasUserLocation) {
+        console.log(`⏭️  ${file} (unchanged, reusing metadata + AVIF)`);
+        const fresh: MetadataItem = {
+          ...existingEntry,
+          title: "",
+          location: existingEntry.location.trim(),
+          sourceMtime: mtimeMs,
+        };
+        result.push(mergePreservedCopy(existingEntry, fresh));
+        continue;
+      }
+
+      if (imageUnchanged && !hasUserLocation && existingEntry) {
+        console.log(`📍 ${file} (unchanged image, inferring location)`);
+        const parsed = await exifr.parse(filePath, true);
+        const tags =
+          parsed && typeof parsed === "object"
+            ? (parsed as Record<string, unknown>)
+            : {};
+        const location = await inferLocation(tags);
+        const fresh: MetadataItem = {
+          ...existingEntry,
+          title: "",
+          location,
+          sourceMtime: mtimeMs,
+        };
+        result.push(mergePreservedCopy(existingEntry, fresh));
+        continue;
+      }
+
       console.log(`📸 Processing ${file}...`);
 
       const parsed = await exifr.parse(filePath, true);
-      const tags = (
-        parsed && typeof parsed === "object" ? parsed : {}
-      ) as Record<string, unknown>;
+      const tags =
+        parsed && typeof parsed === "object"
+          ? (parsed as Record<string, unknown>)
+          : {};
 
       const image = sharp(filePath);
       const { width, height } = await image.metadata();
@@ -156,6 +194,7 @@ export async function generateMetadata(): Promise<void> {
         date: toIsoDate(tags.DateTimeOriginal),
         blurhash,
         blurDataURL,
+        sourceMtime: mtimeMs,
       };
 
       result.push(mergePreservedCopy(existingEntry, fresh));
