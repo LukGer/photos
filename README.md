@@ -1,31 +1,23 @@
-# Next.js & Cloudinary example app
+# Photos
 
-This example shows how to create an image gallery site using Next.js, [Cloudinary](https://cloudinary.com), and [Tailwind](https://tailwindcss.com).
+Static photography gallery built with [Astro](https://astro.build/), [React](https://react.dev/) (islands for motion / magnetic hover), and [Tailwind CSS](https://tailwindcss.com/).
 
-## Deploy your own
+Source images live in `images/`. `bun run build` runs `generate:meta` first: Sharp writes AVIFs to `public/photos/`, refreshes `public/meta.json` (EXIF, blur placeholders). **`location`** is only inferred (embedded IPTC/XMP-style tags, else **GPS + OpenStreetMap Nominatim**, English labels, ~1 req/s) when it is not already set for that photo—so geocoding is skipped for rows with a non-empty `location`. **Non-empty `title` and `location`** are still preserved on merge. Set `NOMINATIM_USER_AGENT` to a stable app id + contact URL for bulk builds ([Nominatim usage policy](https://operations.osmfoundation.org/policies/nominatim/)). Run `bun run generate:meta` alone to regenerate without a full site build.
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=next-example) or view the demo [here](https://nextconf-images.vercel.app/)
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vercel/next.js/tree/canary/examples/with-cloudinary&project-name=nextjs-image-gallery&repository-name=with-cloudinary&env=NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,CLOUDINARY_API_KEY,CLOUDINARY_API_SECRET,CLOUDINARY_FOLDER&envDescription=API%20Keys%20from%20Cloudinary%20needed%20to%20run%20this%20application.)
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
-
-## How to use
-
-Execute [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app) with [npm](https://docs.npmjs.com/cli/init), [Yarn](https://yarnpkg.com/lang/en/docs/cli/create/), or [pnpm](https://pnpm.io) to bootstrap the example::
+## Scripts
 
 ```bash
- npx create-next-app --example with-cloudinary nextjs-image-gallery
+bun install
+bun run dev      # astro dev
+bun run build    # static site → dist/
+bun run preview  # astro preview
+bun run generate:meta
 ```
 
-```bash
-yarn create next-app --example with-cloudinary nextjs-image-gallery
-```
+## Deploy
 
-```bash
-pnpm create next-app --example with-cloudinary nextjs-image-gallery
-```
+`dist/` is plain static HTML/CSS/JS. Host on any static file host (Netlify, S3, etc.) with the document root set to `dist`.
 
-## References
+### Vercel
 
-- Cloudinary API: https://cloudinary.com/documentation/transformation_reference
+[`vercel.json`](vercel.json) pins **install** (`bun install`), **build** (`bun run build` → `generate:meta` then `astro build`), **output** (`dist`), and the **Astro** framework preset so Git pushes match local production builds. Commit the `images/` folder (or otherwise provide sources) so `generate:meta` can run on Vercel.

@@ -1,0 +1,33 @@
+---
+import "../styles/global.css";
+
+interface Props {
+	title?: string;
+	description?: string;
+}
+
+const {
+	title = "Photos - Lukas Gerhold",
+	description = "Photography portfolio by Lukas Gerhold. A collection of photos taken in the last years.",
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="description" content={description} />
+		<meta name="creator" content="Lukas Gerhold" />
+		<link rel="preconnect" href="https://fonts.googleapis.com" />
+		<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+		<link
+			href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;700&family=Nothing+You+Could+Do&display=swap"
+			rel="stylesheet"
+		/>
+		<title>{title}</title>
+	</head>
+	<body class="flex h-screen flex-col bg-muted">
+		<slot />
+	</body>
+</html>
