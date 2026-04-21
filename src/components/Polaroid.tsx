@@ -30,25 +30,27 @@ export function Polaroid({ item }: { item: MetadataItem }) {
       </div>
       <div className="mt-4 flex h-20 flex-col pt-2">
         <span
-          className="font-handwritten self-center text-2xl"
+          className="font-handwritten self-center text-2xl font-black"
           style={{ transform: `rotate(${rotation}deg)` }}
         >
           {item.title}
         </span>
         <div className="flex-1"></div>
-        <span className="font-mono text-xs text-gray-800">
-          {[
-            item.location?.trim(),
-            item.date
+
+        <div className="flex flex-row items-center justify-between">
+          <span className="font-mono text-xs text-gray-400">
+            {item.location}
+          </span>
+
+          <span className="font-mono text-xs text-gray-400">
+            {item.date
               ? new Date(item.date).toLocaleDateString("en-US", {
                   year: "numeric",
-                  month: "long",
+                  month: "short",
                 })
-              : "",
-          ]
-            .filter(Boolean)
-            .join(", ")}
-        </span>
+              : ""}
+          </span>
+        </div>
       </div>
     </div>
   );
