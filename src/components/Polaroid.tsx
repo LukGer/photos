@@ -1,5 +1,6 @@
 "use client";
 
+import { CrossfadeImage } from "@/components/CrossfadeImage";
 import type { MetadataItem } from "@/lib/types";
 
 export function Polaroid({ item }: { item: MetadataItem }) {
@@ -14,18 +15,10 @@ export function Polaroid({ item }: { item: MetadataItem }) {
   return (
     <div className="flex h-full transform-[translateZ(0.01px)] cursor-pointer flex-col rounded-sm bg-white p-4">
       <div className="relative aspect-square w-full overflow-hidden rounded-xs bg-gray-100">
-        <img
-          src={item.blurDataURL}
-          alt=""
-          aria-hidden
-          className="absolute inset-0 size-full scale-110 object-cover blur-xl"
-        />
-        <img
+        <CrossfadeImage
+          blurSrc={item.blurDataURL}
           src={item.src}
           alt={item.title || item.filename}
-          loading="lazy"
-          decoding="async"
-          className="absolute inset-0 size-full object-cover"
         />
       </div>
       <div className="mt-4 flex h-20 flex-col pt-2">
