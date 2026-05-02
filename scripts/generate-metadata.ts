@@ -1,11 +1,12 @@
 import { encode } from "blurhash";
 import exifr from "exifr";
+import { createHash } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
-import { inferLocation } from "./infer-location";
 import type { MetadataItem } from "../src/lib/types";
+import { inferLocation } from "./infer-location";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const projectRoot = path.resolve(__dirname, "..");
@@ -74,6 +75,12 @@ function toIsoDate(value: unknown): string | null {
   return Number.isNaN(d.getTime()) ? null : d.toISOString();
 }
 
+function sha256File(filePath: string): string {
+  const hash = createHash("sha256");
+  hash.update(fs.readFileSync(filePath));
+  return hash.digest("hex");
+}
+
 export async function generateMetadata(): Promise<void> {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -92,10 +99,20 @@ export async function generateMetadata(): Promise<void> {
     const outputFilename = `${baseName}.avif`;
     const outputPath = path.join(outputDir, outputFilename);
     const existingEntry = existingByFilename.get(outputFilename);
-    const stat = fs.statSync(filePath);
-    const mtimeMs = stat.mtimeMs;
+    const outputExists = fs.existsSync(outputPath);
+    let cachedSha256: string | undefined;
+    const sourceSha256 = (): string => {
+      if (cachedSha256 === undefined) {
+        cachedSha256 = sha256File(filePath);
+      }
+      return cachedSha256;
+    };
+
     const imageUnchanged =
-      existingEntry?.sourceMtime === mtimeMs && fs.existsSync(outputPath);
+      outputExists &&
+      existingEntry != null &&
+      existingEntry.sourceSha256 != null &&
+      existingEntry.sourceSha256 === sourceSha256();
     const hasUserLocation = !!(
       existingEntry && userStringOrEmpty(existingEntry.location)
     );
@@ -107,7 +124,7 @@ export async function generateMetadata(): Promise<void> {
           ...existingEntry,
           title: "",
           location: existingEntry.location.trim(),
-          sourceMtime: mtimeMs,
+          sourceSha256: existingEntry.sourceSha256,
         };
         result.push(mergePreservedCopy(existingEntry, fresh));
         continue;
@@ -125,7 +142,7 @@ export async function generateMetadata(): Promise<void> {
           ...existingEntry,
           title: "",
           location,
-          sourceMtime: mtimeMs,
+          sourceSha256: existingEntry.sourceSha256,
         };
         result.push(mergePreservedCopy(existingEntry, fresh));
         continue;
@@ -194,7 +211,7 @@ export async function generateMetadata(): Promise<void> {
         date: toIsoDate(tags.DateTimeOriginal),
         blurhash,
         blurDataURL,
-        sourceMtime: mtimeMs,
+        sourceSha256: sourceSha256(),
       };
 
       result.push(mergePreservedCopy(existingEntry, fresh));

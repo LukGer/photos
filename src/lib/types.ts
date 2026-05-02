@@ -14,6 +14,6 @@ export interface MetadataItem {
   date: string | null;
   blurhash: string;
   blurDataURL: string;
-  /** `fs.stat` `mtimeMs` of the source file in `images/` when last processed; used to skip work if unchanged. */
-  sourceMtime?: number;
+  /** SHA-256 of raw source bytes in `images/` — skip reprocessing when unchanged (CI-safe). */
+  sourceSha256?: string;
 }
