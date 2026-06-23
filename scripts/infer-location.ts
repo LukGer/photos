@@ -45,12 +45,7 @@ function embeddedLocationLine(tags: Record<string, unknown>): string {
     "LocationCreatedCountryName",
     "LocationShownCountryName",
   ]);
-  const region = pickString(tags, [
-    "ProvinceState",
-    "State",
-    "Region",
-    "locationName",
-  ]);
+  const region = pickString(tags, ["ProvinceState", "State", "Region", "locationName"]);
 
   if (city && country) {
     return `${city}, ${country}`;

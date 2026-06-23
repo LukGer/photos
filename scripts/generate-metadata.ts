@@ -22,9 +22,7 @@ function loadExistingByFilename(): Map<string, MetadataItem> {
   try {
     const raw = fs.readFileSync(outputFile, "utf-8");
     const existingData = JSON.parse(raw) as MetadataItem[];
-    const map = new Map(
-      existingData.map((item) => [item.filename, item] as const),
-    );
+    const map = new Map(existingData.map((item) => [item.filename, item] as const));
     console.log(`📋 Loaded ${map.size} existing metadata entries`);
     return map;
   } catch (err) {
@@ -40,18 +38,10 @@ function userStringOrEmpty(value: string | null | undefined): string {
   return t ? t : "";
 }
 
-function mergePreservedCopy(
-  existing: MetadataItem | undefined,
-  fresh: MetadataItem,
-): MetadataItem {
-  const title =
-    existing && userStringOrEmpty(existing.title)
-      ? existing.title.trim()
-      : fresh.title;
+function mergePreservedCopy(existing: MetadataItem | undefined, fresh: MetadataItem): MetadataItem {
+  const title = existing && userStringOrEmpty(existing.title) ? existing.title.trim() : fresh.title;
   const location =
-    existing && userStringOrEmpty(existing.location)
-      ? existing.location.trim()
-      : fresh.location;
+    existing && userStringOrEmpty(existing.location) ? existing.location.trim() : fresh.location;
 
   return {
     ...fresh,
@@ -113,9 +103,7 @@ export async function generateMetadata(): Promise<void> {
       existingEntry != null &&
       existingEntry.sourceSha256 != null &&
       existingEntry.sourceSha256 === sourceSha256();
-    const hasUserLocation = !!(
-      existingEntry && userStringOrEmpty(existingEntry.location)
-    );
+    const hasUserLocation = !!(existingEntry && userStringOrEmpty(existingEntry.location));
 
     try {
       if (imageUnchanged && hasUserLocation) {
@@ -134,9 +122,7 @@ export async function generateMetadata(): Promise<void> {
         console.log(`📍 ${file} (unchanged image, inferring location)`);
         const parsed = await exifr.parse(filePath, true);
         const tags =
-          parsed && typeof parsed === "object"
-            ? (parsed as Record<string, unknown>)
-            : {};
+          parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
         const location = await inferLocation(tags);
         const fresh: MetadataItem = {
           ...existingEntry,
@@ -151,10 +137,7 @@ export async function generateMetadata(): Promise<void> {
       console.log(`📸 Processing ${file}...`);
 
       const parsed = await exifr.parse(filePath, true);
-      const tags =
-        parsed && typeof parsed === "object"
-          ? (parsed as Record<string, unknown>)
-          : {};
+      const tags = parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
 
       const image = sharp(filePath);
       const { width, height } = await image.metadata();
@@ -171,13 +154,7 @@ export async function generateMetadata(): Promise<void> {
         .resize(32, 32, { fit: "inside" })
         .toBuffer({ resolveWithObject: true });
 
-      const blurhash = encode(
-        new Uint8ClampedArray(data),
-        info.width,
-        info.height,
-        4,
-        4,
-      );
+      const blurhash = encode(new Uint8ClampedArray(data), info.width, info.height, 4, 4);
 
       const blurDataURL = await image
         .clone()
@@ -202,10 +179,7 @@ export async function generateMetadata(): Promise<void> {
         height,
         iso: (tags.ISO as number | undefined) ?? null,
         aperture: tags.FNumber != null ? `f/${tags.FNumber as number}` : null,
-        shutter:
-          tags.ExposureTime != null
-            ? formatExposure(tags.ExposureTime as number)
-            : null,
+        shutter: tags.ExposureTime != null ? formatExposure(tags.ExposureTime as number) : null,
         camera: (tags.Model as string | undefined) ?? null,
         lens: (tags.LensModel as string | undefined) ?? null,
         date: toIsoDate(tags.DateTimeOriginal),

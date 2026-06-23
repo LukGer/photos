@@ -19,12 +19,7 @@ async function waitPaintable(img: HTMLImageElement): Promise<void> {
   return img.decode().catch(() => undefined);
 }
 
-export function CrossfadeImage({
-  blurSrc,
-  src,
-  alt,
-  loading = "lazy",
-}: CrossfadeImageProps) {
+export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: CrossfadeImageProps) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const genRef = useRef(0);

@@ -1,13 +1,7 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-  useTransform,
-} from "motion/react";
+import { motion, useMotionValue, useReducedMotion, useSpring, useTransform } from "motion/react";
 import * as React from "react";
 
 const spring = { stiffness: 320, damping: 28, mass: 0.45 };
@@ -143,10 +137,7 @@ export function Magnetic({
 
   return (
     <div
-      className={cn(
-        "relative perspective-[min(96vw,920px)] transform-3d",
-        className,
-      )}
+      className={cn("relative perspective-[min(96vw,920px)] transform-3d", className)}
       style={{ perspectiveOrigin: "50% 50%" }}
     >
       <motion.div
