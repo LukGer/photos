@@ -1,5 +1,6 @@
 ---
 import { Gallery } from "../components/Gallery";
+import { RetroToggle } from "../components/RetroToggle";
 import Layout from "../layouts/Layout.astro";
 import { getSortedMetadata } from "../lib/metadata";
 
@@ -7,12 +8,13 @@ const items = getSortedMetadata();
 ---
 
 <Layout>
-	<main class="flex flex-col gap-2 p-4">
-		<div class="flex flex-row px-1.5">
-			<h1 class="font-mono text-4xl font-bold">The Gallery</h1>
-			<div class="flex-1"></div>
-			<a href="https://lukger.dev" class="text-xs">(c) 2025 Lukas Gerhold</a>
-		</div>
-		<Gallery client:load items={items} />
-	</main>
+  <main class="flex flex-col gap-2 p-4">
+    <div class="flex flex-row items-center gap-3 px-1.5">
+      <h1 class="font-mono text-4xl font-bold">The Gallery</h1>
+      <div class="flex-1"></div>
+      <RetroToggle client:load />
+      <a href="https://lukger.dev" class="text-xs">(c) 2025 Lukas Gerhold</a>
+    </div>
+    <Gallery client:load items={items} />
+  </main>
 </Layout>

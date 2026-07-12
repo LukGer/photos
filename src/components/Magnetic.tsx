@@ -14,6 +14,8 @@ const mouseSpring = { stiffness: 420, damping: 38, mass: 0.22 };
 type MagneticProps = {
   children: React.ReactNode;
   className?: string;
+  /** Extra classes for the inner (clipping) card element. */
+  contentClassName?: string;
   /** Max tilt in degrees (pointer at card edge). */
   maxTilt?: number;
   /** Scale while pointer is over the card. */
@@ -27,6 +29,7 @@ type MagneticProps = {
 export function Magnetic({
   children,
   className,
+  contentClassName,
   maxTilt = 11,
   hoverScale = 1.045,
   hoverLift = 22,
@@ -141,7 +144,10 @@ export function Magnetic({
       style={{ perspectiveOrigin: "50% 50%" }}
     >
       <motion.div
-        className="pointer-events-none relative transform-gpu overflow-hidden rounded-sm shadow-md backface-hidden transform-3d"
+        className={cn(
+          "pointer-events-none relative transform-gpu overflow-hidden rounded-sm shadow-md backface-hidden transform-3d",
+          contentClassName,
+        )}
         style={{ transform, willChange: "transform" }}
       >
         {children}

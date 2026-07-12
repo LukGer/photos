@@ -42,6 +42,7 @@
 
   --font-mono: "Geist Mono", ui-monospace, monospace;
   --font-handwritten: "Nothing You Could Do", cursive;
+  --font-retro: "Press Start 2P", "Geist Mono", ui-monospace, monospace;
 
   @keyframes accordion-down {
     from {

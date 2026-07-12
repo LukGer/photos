@@ -2,9 +2,12 @@
 
 import { Magnetic } from "@/components/Magnetic";
 import { Polaroid } from "@/components/Polaroid";
+import { useRetroMode } from "@/lib/retro-mode";
 import type { MetadataItem } from "@/lib/types";
 
 export function Gallery({ items }: { items: MetadataItem[] }) {
+  const retro = useRetroMode();
+
   return (
     <div className="grid flex-1 grid-cols-[repeat(auto-fill,minmax(min(100%,300px),1fr))] gap-6">
       {items.map((item, index) => (
@@ -14,7 +17,7 @@ export function Gallery({ items }: { items: MetadataItem[] }) {
           className="gallery-card-enter relative block min-h-0 min-w-0"
           style={{ animationDelay: `${index * 42}ms` }}
         >
-          <Magnetic maxTilt={8}>
+          <Magnetic maxTilt={8} contentClassName={retro ? "rounded-none" : undefined}>
             <Polaroid item={item} />
           </Magnetic>
         </a>
