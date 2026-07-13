@@ -25,13 +25,24 @@ const imageData = getSortedMetadata().find((item) => item.filename === slug);
 				<div class="absolute bottom-4 left-4 ">
 					<ImageInfos image={imageData} />
 				</div>
-				<div class="max-h-[80vh] max-w-full">
+				<div class="relative max-h-[80vh] max-w-full">
+					<img
+						src={imageData.blurDataURL}
+						alt=""
+						aria-hidden="true"
+						width={imageData.width}
+						height={imageData.height}
+						data-detail-blur
+						class="pointer-events-none absolute inset-0 max-h-[80vh] max-w-full scale-105 object-contain blur-xl transition-opacity duration-500 ease-out"
+					/>
 					<img
 						src={imageData.src}
 						alt={imageData.filename}
 						width={imageData.width}
 						height={imageData.height}
-						class="max-h-[80vh] max-w-full object-contain"
+						data-detail-image
+						data-loaded="false"
+						class="relative max-h-[80vh] max-w-full object-contain opacity-0 transition-opacity duration-500 ease-out data-[loaded=true]:opacity-100"
 						loading="eager"
 						decoding="async"
 					/>
@@ -47,3 +58,19 @@ const imageData = getSortedMetadata().find((item) => item.filename === slug);
 		)
 	}
 </Layout>
+
+<script>
+	function reveal(img: HTMLImageElement) {
+		img.dataset.loaded = "true";
+		const blur = img.parentElement?.querySelector<HTMLElement>("[data-detail-blur]");
+		if (blur) blur.style.opacity = "0";
+	}
+	document.querySelectorAll<HTMLImageElement>("[data-detail-image]").forEach((img) => {
+		if (img.complete && img.naturalWidth > 0) {
+			// Already decoded (cache hit) — reveal on next frame so the transition runs.
+			requestAnimationFrame(() => reveal(img));
+		} else {
+			img.addEventListener("load", () => reveal(img), { once: true });
+		}
+	});
+</script>
