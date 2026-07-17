@@ -2,6 +2,7 @@
 
 import { ditherImage } from "@/lib/dither";
 import { useRetroMode } from "@/lib/retro-mode";
+import { cn } from "@/lib/utils";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type CrossfadeImageProps = {
@@ -9,6 +10,11 @@ type CrossfadeImageProps = {
   src: string;
   alt: string;
   loading?: "lazy" | "eager";
+  /** `cover` fills a square (gallery). `contain` sizes to the image (detail). */
+  fit?: "cover" | "contain";
+  width?: number;
+  height?: number;
+  className?: string;
 };
 
 function isFetched(img: HTMLImageElement) {
@@ -21,7 +27,16 @@ async function waitPaintable(img: HTMLImageElement): Promise<void> {
   return img.decode().catch(() => undefined);
 }
 
-export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: CrossfadeImageProps) {
+export function CrossfadeImage({
+  blurSrc,
+  src,
+  alt,
+  loading = "lazy",
+  fit = "cover",
+  width,
+  height,
+  className,
+}: CrossfadeImageProps) {
   const [loaded, setLoaded] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
   const genRef = useRef(0);
@@ -29,6 +44,8 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
   const retro = useRetroMode();
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [retroReady, setRetroReady] = useState(false);
+
+  const contain = fit === "contain";
 
   const revealWhenCurrent = (gen: number) => {
     const img = imgRef.current;
@@ -68,7 +85,11 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
       const h = Math.round(rect.height * dpr);
       if (w === 0 || h === 0) return;
 
-      void ditherImage(img, w, h).then((bitmap) => {
+      // Pin CSS size to the image box so a wider wrapper can't stretch the bitmap.
+      canvas.style.width = `${rect.width}px`;
+      canvas.style.height = `${rect.height}px`;
+
+      void ditherImage(img, w, h, fit).then((bitmap) => {
         if (cancelled || !bitmap) return;
         canvas.width = w;
         canvas.height = h;
@@ -99,7 +120,50 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
         window.clearTimeout(idleId);
       }
     };
-  }, [retro, loaded, src]);
+  }, [retro, loaded, src, fit]);
+
+  if (contain && width && height) {
+    return (
+      <div
+        className={cn("relative max-h-[80vh] max-w-full", className)}
+        style={{
+          aspectRatio: `${width} / ${height}`,
+          width: `min(100%, calc(80vh * ${width} / ${height}))`,
+        }}
+      >
+        <img
+          src={blurSrc}
+          alt=""
+          aria-hidden
+          width={width}
+          height={height}
+          data-loaded={loaded}
+          className="pointer-events-none absolute inset-0 size-full scale-105 object-cover blur-xl transition-opacity duration-500 ease-out data-[loaded=false]:opacity-100 data-[loaded=true]:opacity-0"
+        />
+        <img
+          ref={imgRef}
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          loading={loading}
+          decoding="async"
+          onLoad={() => revealWhenCurrent(genRef.current)}
+          className={cn(
+            "relative size-full object-cover transition-opacity duration-500 ease-out",
+            loaded ? "opacity-100" : "opacity-0",
+          )}
+        />
+        <canvas
+          ref={canvasRef}
+          aria-hidden
+          data-ready={retro && retroReady}
+          style={{ imageRendering: "pixelated" }}
+          className="pointer-events-none absolute top-0 left-0 opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
+        />
+      </div>
+    );
+  }
 
   return (
     <>
@@ -107,6 +171,8 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
         src={blurSrc}
         alt=""
         aria-hidden
+        width={width}
+        height={height}
         data-loaded={loaded}
         className="absolute inset-0 size-full scale-110 object-cover blur-xl transition-opacity duration-500 ease-out data-[loaded=false]:opacity-100 data-[loaded=true]:opacity-0"
       />
@@ -114,6 +180,8 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
         ref={imgRef}
         src={src}
         alt={alt}
+        width={width}
+        height={height}
         loading={loading}
         decoding="async"
         onLoad={() => revealWhenCurrent(genRef.current)}
@@ -126,7 +194,7 @@ export function CrossfadeImage({ blurSrc, src, alt, loading = "lazy" }: Crossfad
         aria-hidden
         data-ready={retro && retroReady}
         style={{ imageRendering: "pixelated" }}
-        className="absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
+        className="pointer-events-none absolute inset-0 size-full opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
       />
     </>
   );

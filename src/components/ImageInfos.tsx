@@ -1,4 +1,7 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { useRetroMode } from "@/lib/retro-mode";
 import type { MetadataItem } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -15,7 +18,7 @@ function InfoRow({
 
   return (
     <div className={cn("group contents", className)}>
-      <span className="text-right text-gray-200 opacity-100 transition-opacity duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] md:opacity-10 md:group-hover:opacity-100">
+      <span className="text-right text-white/25 transition-colors duration-200 ease-[cubic-bezier(0.23,1,0.32,1)] md:group-hover:text-white">
         {label}
       </span>
       <span className="text-left font-bold text-gray-50">{value}</span>
@@ -24,8 +27,15 @@ function InfoRow({
 }
 
 export function ImageInfos({ image }: { image: MetadataItem }) {
+  const retro = useRetroMode();
+
   return (
-    <div className="grid max-w-lg grid-cols-[max-content_1fr] gap-x-6 gap-y-1 font-mono text-sm">
+    <div
+      className={cn(
+        "grid max-w-lg grid-cols-[max-content_1fr] gap-x-6 gap-y-1 text-sm",
+        retro ? "font-retro text-[10px] leading-relaxed" : "font-mono",
+      )}
+    >
       <InfoRow label="Title" value={image.title} />
       <InfoRow label="Location" value={image.location} />
       <InfoRow

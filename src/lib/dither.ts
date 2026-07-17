@@ -176,16 +176,17 @@ export function isRetroSupported(): boolean {
 
 /**
  * Runs the palette-dither pass over `img` at the given pixel dimensions and
- * returns an ImageBitmap of the result. Cached per src+size.
+ * returns an ImageBitmap of the result. Cached per src+size+fit.
  */
 export async function ditherImage(
   img: HTMLImageElement,
   width: number,
   height: number,
+  objectFit: "cover" | "contain" = "cover",
 ): Promise<ImageBitmap | null> {
   const w = Math.max(1, Math.round(width));
   const h = Math.max(1, Math.round(height));
-  const key = keyFor(img.currentSrc || img.src, w, h);
+  const key = `${keyFor(img.currentSrc || img.src, w, h)}:${objectFit}`;
   const cached = cache.get(key);
   if (cached) return cached;
 
@@ -206,17 +207,20 @@ export async function ditherImage(
     return null;
   }
 
-  // Cover crop: sample the image the same way CSS `object-fit: cover` would.
+  // `cover` center-crops like CSS object-fit (gallery). `contain` samples the
+  // full frame — caller sizes the canvas to the image's aspect ratio.
   const imgW = img.naturalWidth || w;
   const imgH = img.naturalHeight || h;
   const canvasAspect = w / h;
   const imgAspect = imgW / imgH;
   let scaleX = 1;
   let scaleY = 1;
-  if (imgAspect > canvasAspect) {
-    scaleX = canvasAspect / imgAspect;
-  } else {
-    scaleY = imgAspect / canvasAspect;
+  if (objectFit === "cover") {
+    if (imgAspect > canvasAspect) {
+      scaleX = canvasAspect / imgAspect;
+    } else {
+      scaleY = imgAspect / canvasAspect;
+    }
   }
   const offsetX = (1 - scaleX) / 2;
   const offsetY = (1 - scaleY) / 2;

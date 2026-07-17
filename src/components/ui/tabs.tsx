@@ -28,6 +28,7 @@ function TabsList({
       {...props}
     >
       <TabsPrimitive.Indicator
+        data-slot="tabs-indicator"
         className="absolute top-(--active-tab-top) left-(--active-tab-left) z-0 h-(--active-tab-height) w-(--active-tab-width) rounded-md bg-background shadow-sm transition-[top,left,width,height] duration-200 ease-[cubic-bezier(0.23,1,0.32,1)]"
       />
       {children}

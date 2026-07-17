@@ -15,7 +15,7 @@ export function Gallery({ items }: { items: MetadataItem[] }) {
       {items.map((item, index) => (
         <a
           key={item.filename}
-          href={`/p/${item.filename}`}
+          href={retro ? `/p/${item.filename}?retro=1` : `/p/${item.filename}`}
           className="gallery-card-enter relative block min-h-0 min-w-0"
           style={{ animationDelay: reduceMotion ? "0ms" : `${Math.min(index, 12) * 42}ms` }}
         >

@@ -1,6 +1,8 @@
 ---
 import { BackButton } from "../../components/BackButton";
+import { CrossfadeImage } from "../../components/CrossfadeImage";
 import { ImageInfos } from "../../components/ImageInfos";
+import { RetroToggle } from "../../components/RetroToggle";
 import Layout from "../../layouts/Layout.astro";
 import { getSortedMetadata, loadMetadata } from "../../lib/metadata";
 
@@ -18,35 +20,28 @@ const imageData = getSortedMetadata().find((item) => item.filename === slug);
 <Layout title={imageData ? `${imageData.title} - Photos` : "Not found"}>
 	{
 		imageData ? (
-			<div class="flex min-h-screen justify-center bg-black pt-[10vh] relative">
-				<div class="absolute top-4 left-4 ">
+			<div class="relative flex min-h-screen justify-center bg-black pt-[10vh]">
+				<div class="absolute inset-x-0 top-0 z-20 flex flex-row items-center gap-3 p-4 px-[1.375rem]">
 					<BackButton client:load />
+					<div class="flex-1" />
+					<RetroToggle client:load variant="dark" />
+					<a href="https://lukger.dev" class="text-xs text-white/70">
+						(c) 2025 Lukas Gerhold
+					</a>
 				</div>
-				<div class="absolute bottom-4 left-4 ">
-					<ImageInfos image={imageData} />
+				<div class="absolute bottom-4 left-4 z-10">
+					<ImageInfos client:load image={imageData} />
 				</div>
-				<div class="relative max-h-[80vh] max-w-full">
-					<img
-						src={imageData.blurDataURL}
-						alt=""
-						aria-hidden="true"
-						width={imageData.width}
-						height={imageData.height}
-						data-detail-blur
-						class="pointer-events-none absolute inset-0 max-h-[80vh] max-w-full scale-105 object-contain blur-xl transition-opacity duration-500 ease-out"
-					/>
-					<img
-						src={imageData.src}
-						alt={imageData.filename}
-						width={imageData.width}
-						height={imageData.height}
-						data-detail-image
-						data-loaded="false"
-						class="relative max-h-[80vh] max-w-full object-contain opacity-0 transition-opacity duration-500 ease-out data-[loaded=true]:opacity-100"
-						loading="eager"
-						decoding="async"
-					/>
-				</div>
+				<CrossfadeImage
+					client:load
+					fit="contain"
+					blurSrc={imageData.blurDataURL}
+					src={imageData.src}
+					alt={imageData.filename}
+					width={imageData.width}
+					height={imageData.height}
+					loading="eager"
+				/>
 			</div>
 		) : (
 			<div class="flex min-h-screen items-center justify-center">
@@ -58,19 +53,3 @@ const imageData = getSortedMetadata().find((item) => item.filename === slug);
 		)
 	}
 </Layout>
-
-<script>
-	function reveal(img: HTMLImageElement) {
-		img.dataset.loaded = "true";
-		const blur = img.parentElement?.querySelector<HTMLElement>("[data-detail-blur]");
-		if (blur) blur.style.opacity = "0";
-	}
-	document.querySelectorAll<HTMLImageElement>("[data-detail-image]").forEach((img) => {
-		if (img.complete && img.naturalWidth > 0) {
-			// Already decoded (cache hit) — reveal on next frame so the transition runs.
-			requestAnimationFrame(() => reveal(img));
-		} else {
-			img.addEventListener("load", () => reveal(img), { once: true });
-		}
-	});
-</script>
