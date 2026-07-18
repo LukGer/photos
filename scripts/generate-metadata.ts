@@ -6,6 +6,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import sharp from "sharp";
 import type { MetadataItem } from "../src/lib/types";
+import { RETRO_PARAMS_HASH, renderRetroPng } from "./dither-cpu";
 import { inferLocation } from "./infer-location";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -71,6 +72,35 @@ function sha256File(filePath: string): string {
   return hash.digest("hex");
 }
 
+/**
+ * Ensures the precomputed retro (palette-dithered) PNG exists and is current,
+ * regenerating it when the file is missing, the source changed, or the dither
+ * params changed. Returns the fields to store on the metadata item.
+ */
+async function ensureRetro(
+  filePath: string,
+  baseName: string,
+  existing: MetadataItem | undefined,
+  imageUnchanged: boolean,
+): Promise<{ retroSrc: string; retroParamsHash: string }> {
+  const retroFilename = `${baseName}.retro.png`;
+  const retroPath = path.join(outputDir, retroFilename);
+  const retroSrc = `/photos/${retroFilename}`;
+
+  const upToDate =
+    imageUnchanged &&
+    fs.existsSync(retroPath) &&
+    existing?.retroParamsHash === RETRO_PARAMS_HASH;
+
+  if (!upToDate) {
+    const png = await renderRetroPng(sharp(filePath));
+    fs.writeFileSync(retroPath, png);
+    console.log(`   🕹️  retro ${retroFilename}`);
+  }
+
+  return { retroSrc, retroParamsHash: RETRO_PARAMS_HASH };
+}
+
 export async function generateMetadata(): Promise<void> {
   if (!fs.existsSync(outputDir)) {
     fs.mkdirSync(outputDir, { recursive: true });
@@ -108,10 +138,12 @@ export async function generateMetadata(): Promise<void> {
     try {
       if (imageUnchanged && hasUserLocation) {
         console.log(`⏭️  ${file} (unchanged, reusing metadata + AVIF)`);
+        const retro = await ensureRetro(filePath, baseName, existingEntry, imageUnchanged);
         const fresh: MetadataItem = {
           ...existingEntry,
           title: "",
           location: existingEntry.location.trim(),
+          ...retro,
           sourceSha256: existingEntry.sourceSha256,
         };
         result.push(mergePreservedCopy(existingEntry, fresh));
@@ -124,10 +156,12 @@ export async function generateMetadata(): Promise<void> {
         const tags =
           parsed && typeof parsed === "object" ? (parsed as Record<string, unknown>) : {};
         const location = await inferLocation(tags);
+        const retro = await ensureRetro(filePath, baseName, existingEntry, imageUnchanged);
         const fresh: MetadataItem = {
           ...existingEntry,
           title: "",
           location,
+          ...retro,
           sourceSha256: existingEntry.sourceSha256,
         };
         result.push(mergePreservedCopy(existingEntry, fresh));
@@ -165,6 +199,8 @@ export async function generateMetadata(): Promise<void> {
 
       await image.avif({ quality: 50 }).toFile(outputPath);
 
+      const retro = await ensureRetro(filePath, baseName, existingEntry, imageUnchanged);
+
       const location =
         existingEntry && userStringOrEmpty(existingEntry.location)
           ? existingEntry.location.trim()
@@ -185,6 +221,7 @@ export async function generateMetadata(): Promise<void> {
         date: toIsoDate(tags.DateTimeOriginal),
         blurhash,
         blurDataURL,
+        ...retro,
         sourceSha256: sourceSha256(),
       };
 

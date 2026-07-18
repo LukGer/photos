@@ -37,6 +37,7 @@ const imageData = getSortedMetadata().find((item) => item.filename === slug);
 					fit="contain"
 					blurSrc={imageData.blurDataURL}
 					src={imageData.src}
+					retroSrc={imageData.retroSrc}
 					alt={imageData.filename}
 					width={imageData.width}
 					height={imageData.height}

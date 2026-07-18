@@ -1,13 +1,14 @@
 "use client";
 
-import { ditherImage } from "@/lib/dither";
 import { useRetroMode } from "@/lib/retro-mode";
 import { cn } from "@/lib/utils";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useDeferredValue, useEffect, useLayoutEffect, useRef, useState } from "react";
 
 type CrossfadeImageProps = {
   blurSrc: string;
   src: string;
+  /** Precomputed retro (palette-dithered) variant, baked at build time. */
+  retroSrc: string;
   alt: string;
   loading?: "lazy" | "eager";
   /** `cover` fills a square (gallery). `contain` sizes to the image (detail). */
@@ -30,6 +31,7 @@ async function waitPaintable(img: HTMLImageElement): Promise<void> {
 export function CrossfadeImage({
   blurSrc,
   src,
+  retroSrc,
   alt,
   loading = "lazy",
   fit = "cover",
@@ -41,9 +43,11 @@ export function CrossfadeImage({
   const imgRef = useRef<HTMLImageElement>(null);
   const genRef = useRef(0);
 
-  const retro = useRetroMode();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [retroReady, setRetroReady] = useState(false);
+  // Defer the image reveal so a toggle click paints the control immediately and
+  // the (heavier) crossfade across every tile follows as a low-priority update.
+  const retro = useDeferredValue(useRetroMode());
+  const retroImgRef = useRef<HTMLImageElement>(null);
+  const [retroLoaded, setRetroLoaded] = useState(false);
 
   const contain = fit === "contain";
 
@@ -65,62 +69,22 @@ export function CrossfadeImage({
     }
   }, [src]);
 
-  // Precompute the retro (dithered) frame as soon as the image is loaded, so
-  // toggling retro is just an opacity switch. Not gated on `retro`.
+  // Decode the retro bitmap while it's still hidden so toggling doesn't trigger a
+  // decode storm across every tile (which would jank the crossfade + tab animation).
+  const markRetroReady = () => {
+    const img = retroImgRef.current;
+    if (!img) return;
+    void (typeof img.decode === "function" ? img.decode().catch(() => undefined) : Promise.resolve())
+      .then(() => setRetroLoaded(true));
+  };
+
+  // The retro <img> loads eagerly, so it may already be complete (cache hit)
+  // before React attaches onLoad. Reconcile against the actual element.
   useEffect(() => {
-    if (!loaded) {
-      setRetroReady(false);
-      return;
-    }
-    const img = imgRef.current;
-    const canvas = canvasRef.current;
-    if (!img || !canvas || !isFetched(img)) return;
-
-    let cancelled = false;
-    const run = () => {
-      if (cancelled) return;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const rect = img.getBoundingClientRect();
-      const w = Math.round(rect.width * dpr);
-      const h = Math.round(rect.height * dpr);
-      if (w === 0 || h === 0) return;
-
-      // Pin CSS size to the image box so a wider wrapper can't stretch the bitmap.
-      canvas.style.width = `${rect.width}px`;
-      canvas.style.height = `${rect.height}px`;
-
-      void ditherImage(img, w, h, fit).then((bitmap) => {
-        if (cancelled || !bitmap) return;
-        canvas.width = w;
-        canvas.height = h;
-        const ctx = canvas.getContext("2d");
-        if (!ctx) return;
-        ctx.drawImage(bitmap, 0, 0);
-        setRetroReady(true);
-      });
-    };
-
-    // If retro is already active, compute now; otherwise warm the cache during
-    // idle time so the first toggle is instant.
-    let idleId: number | undefined;
-    if (retro) {
-      run();
-    } else if (typeof window.requestIdleCallback === "function") {
-      idleId = window.requestIdleCallback(run);
-    } else {
-      idleId = window.setTimeout(run, 1);
-    }
-
-    return () => {
-      cancelled = true;
-      if (idleId === undefined) return;
-      if (typeof window.cancelIdleCallback === "function") {
-        window.cancelIdleCallback(idleId);
-      } else {
-        window.clearTimeout(idleId);
-      }
-    };
-  }, [retro, loaded, src, fit]);
+    const img = retroImgRef.current;
+    if (img && isFetched(img)) markRetroReady();
+    else setRetroLoaded(false);
+  }, [retroSrc]);
 
   if (contain && width && height) {
     return (
@@ -154,12 +118,18 @@ export function CrossfadeImage({
             loaded ? "opacity-100" : "opacity-0",
           )}
         />
-        <canvas
-          ref={canvasRef}
+        <img
+          ref={retroImgRef}
+          src={retroSrc}
+          alt=""
           aria-hidden
-          data-ready={retro && retroReady}
+          loading="lazy"
+          decoding="async"
+          fetchPriority="low"
+          onLoad={() => setRetroLoaded(true)}
+          data-ready={retro && retroLoaded}
           style={{ imageRendering: "pixelated" }}
-          className="pointer-events-none absolute top-0 left-0 opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
+          className="pointer-events-none absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
         />
       </div>
     );
@@ -189,12 +159,18 @@ export function CrossfadeImage({
           loaded ? "opacity-100" : "opacity-0"
         }`}
       />
-      <canvas
-        ref={canvasRef}
+      <img
+        ref={retroImgRef}
+        src={retroSrc}
+        alt=""
         aria-hidden
-        data-ready={retro && retroReady}
-        style={{ imageRendering: "pixelated" }}
-        className="pointer-events-none absolute inset-0 size-full opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
+        loading="lazy"
+        decoding="async"
+        fetchPriority="low"
+        onLoad={markRetroReady}
+        data-ready={retro && retroLoaded}
+        style={{ imageRendering: "pixelated", willChange: "opacity", transform: "translateZ(0)" }}
+        className="pointer-events-none absolute inset-0 size-full object-cover opacity-0 transition-opacity duration-500 ease-out data-[ready=true]:opacity-100"
       />
     </>
   );

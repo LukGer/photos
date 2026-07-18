@@ -23,6 +23,7 @@ export function Polaroid({ item }: { item: MetadataItem }) {
         <CrossfadeImage
           blurSrc={item.blurDataURL}
           src={item.src}
+          retroSrc={item.retroSrc}
           alt={item.title || item.filename}
         />
       </div>
